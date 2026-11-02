@@ -37,7 +37,8 @@ public sealed class StoreLicense
 #endif
         try
         {
-            var license = await _context.GetAppLicenseAsync();
+            // Never leave the window waiting on the Store: past the timeout the catch below applies.
+            var license = await _context.GetAppLicenseAsync().AsTask().WaitAsync(TimeSpan.FromSeconds(15));
             var entitlement = FromLicense(license);
             RememberPaid(entitlement);
             return entitlement;

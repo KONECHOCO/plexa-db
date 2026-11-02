@@ -5,7 +5,7 @@
          xmlns:desktop2="http://schemas.microsoft.com/appx/manifest/desktop/windows10/2"
          IgnorableNamespaces="uap rescap desktop2">
   <!-- Name comes from the name reserved in Partner Center (Product identity page). -->
-  <Identity Name="IKONETSOLUTIONS.PlexaDB" Publisher="CN=4C92E42E-BF2E-4754-85E0-62CB2D50F185" Version="1.0.0.0" ProcessorArchitecture="x64" />
+  <Identity Name="IKONETSOLUTIONS.PlexaDB" Publisher="CN=4C92E42E-BF2E-4754-85E0-62CB2D50F185" Version="1.0.1.0" ProcessorArchitecture="x64" />
   <Properties>
     <DisplayName>Plexa DB</DisplayName>
     <PublisherDisplayName>IKONETSOLUTIONS</PublisherDisplayName>

@@ -13,7 +13,7 @@ public sealed class MainForm : Form
 
     public MainForm()
     {
-        _dataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PlexaDB");
+        _dataDir = DataDirectory();
         Directory.CreateDirectory(_dataDir);
         _gateway = new GatewayProcess(_dataDir);
 
@@ -36,6 +36,8 @@ public sealed class MainForm : Form
             await _web.EnsureCoreWebView2Async(env);
             _web.CoreWebView2.Settings.AreDevToolsEnabled = false;
             _web.CoreWebView2.WebMessageReceived += OnWebMessage;
+            // Something on screen while the gateway starts: it can take a while on a cold PC.
+            _web.CoreWebView2.NavigateToString(LoadingPage);
 
             _store = new StoreLicense(Handle, _dataDir);
             var entitlement = await _store.ReadAsync();
@@ -49,6 +51,29 @@ public sealed class MainForm : Form
             Close();
         }
     }
+
+    // Installed from the Store, AppData\Local is redirected for this app but not for the
+    // WebView2 browser processes, which then render nothing: use the package's own folder.
+    private static string DataDirectory()
+    {
+        try
+        {
+            return Windows.Storage.ApplicationData.Current.LocalFolder.Path;
+        }
+        catch (InvalidOperationException)
+        {
+            // Not packaged (development build)
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PlexaDB");
+        }
+    }
+
+    private const string LoadingPage = """
+        <!doctype html><html><body style="margin:0;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#161616;color:#f4f4f4;font-family:'Segoe UI',sans-serif">
+        <div style="font-size:28px;font-weight:600">Plexa DB</div>
+        <div style="margin-top:20px;width:28px;height:28px;border:3px solid #393939;border-top-color:#0f62fe;border-radius:50%;animation:s 1s linear infinite"></div>
+        <style>@keyframes s{to{transform:rotate(360deg)}}</style>
+        </body></html>
+        """;
 
     private async void OnWebMessage(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
